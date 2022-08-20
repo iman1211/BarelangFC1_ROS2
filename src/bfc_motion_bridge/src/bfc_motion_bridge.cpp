@@ -1,8 +1,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "std_msgs/msg/string.hpp"
-#include "std_msgs/msg/int32.hpp"
-#include "std_msgs/msg/float32_multi_array.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "bfc_msgs/msg/head_movement.hpp"
 #include "bfc_msgs/msg/button.hpp"
@@ -55,7 +53,7 @@ void initSendDataMotion()
 void runLuaProgram()
 {
     // system("killall screen");
-    system("cd ros2_barelangfc/src/bfc_motion_bridge/source_code/Player;screen -S dcm lua run_dcm.lua;screen -S player lua walk_server.lua;");
+    system("cd /home/nvidia-tegra/BarelangFC5-Nasional/Player/;screen -S dcm lua run_dcm.lua;screen -S player lua walk_server.lua;");
     // system("ls");
 }
 
@@ -78,8 +76,7 @@ private:
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr motion_command_;
     rclcpp::Publisher<bfc_msgs::msg::Button>::SharedPtr button_state_;
     rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_state_;
-    rclcpp::TimerBase::SharedPtr timer_button_;
-    rclcpp::TimerBase::SharedPtr timer_imu_;
+    rclcpp::TimerBase::SharedPtr timer_;
 
     int accelero_x, accelero_y, accelero_z, gyroscope_x, gyroscope_y, gyroscope_z, roll, pitch, yaw, strategy, kill, voltage = 0;
 };
@@ -104,7 +101,7 @@ motion_bridge::motion_bridge() : Node("motion_bridge")
 
     button_state_ = this->create_publisher<bfc_msgs::msg::Button>("robot_button", 10);
     imu_state_ = this->create_publisher<sensor_msgs::msg::Imu>("robot_imu", 10);
-    timer_button_ = this->create_wall_timer(std::chrono::milliseconds(50),
+    timer_ = this->create_wall_timer(std::chrono::milliseconds(50),
                                             std::bind(&motion_bridge::publishSensor, this));
 }
 
@@ -176,35 +173,35 @@ void motion_bridge::getSensor()
 	countParse = 0;
 	spr = strtok (line, ";");
 	while (spr != NULL) {
-		if (countParse == 0)	  { sscanf(spr, "%ld", &accelero_x); } //x					#dpn-blkng
-		else if (countParse == 1) { sscanf(spr, "%ld", &accelero_y); } //y					#kiri-kanan
-		else if (countParse == 2) { sscanf(spr, "%ld", &accelero_z); } //z
-		else if (countParse == 3) { sscanf(spr, "%ld", &gyroscope_x); } //				#kiri-kanan
-		else if (countParse == 4) { sscanf(spr, "%ld", &gyroscope_y); } //				#dpn-blkng
-		else if (countParse == 5) { sscanf(spr, "%ld", &gyroscope_z); } //
-		else if (countParse == 6) { sscanf(spr, "%ld", &roll); } //roll
-		else if (countParse == 7) { sscanf(spr, "%ld", &pitch); } //pitch
-		else if (countParse == 8) { sscanf(spr, "%ld", &yaw); } //yaw
-		else if (countParse == 9) { sscanf(spr, "%ld", &strategy); } //
-		else if (countParse == 10) { sscanf(spr, "%ld", &kill); }
-		else if (countParse == 11) { sscanf(spr, "%ld", &voltage); //countParse = -1; 
+		if (countParse == 0)	  { sscanf(spr, "%d", &accelero_x); } //x					#dpn-blkng
+		else if (countParse == 1) { sscanf(spr, "%d", &accelero_y); } //y					#kiri-kanan
+		else if (countParse == 2) { sscanf(spr, "%d", &accelero_z); } //z
+		else if (countParse == 3) { sscanf(spr, "%d", &gyroscope_x); } //				#kiri-kanan
+		else if (countParse == 4) { sscanf(spr, "%d", &gyroscope_y); } //				#dpn-blkng
+		else if (countParse == 5) { sscanf(spr, "%d", &gyroscope_z); } //
+		else if (countParse == 6) { sscanf(spr, "%d", &roll); } //roll
+		else if (countParse == 7) { sscanf(spr, "%d", &pitch); } //pitch
+		else if (countParse == 8) { sscanf(spr, "%d", &yaw); } //yaw
+		else if (countParse == 9) { sscanf(spr, "%d", &strategy); } //
+		else if (countParse == 10) { sscanf(spr, "%d", &kill); }
+		else if (countParse == 11) { sscanf(spr, "%d", &voltage); //countParse = -1; 
 		} //
 		spr = strtok (NULL,";");
 		countParse++;
 	}
 	fclose(outputfp);
-    printf("countParse = %d\n", countParse);
-	printf("  accr(%ld, %ld, %ld)", accelero_x, accelero_y, accelero_z);
-	printf("  gyro(%ld, %ld, %ld)", gyroscope_x, gyroscope_y, gyroscope_z);
-	printf("  angle(%ld, %ld, %ld)\n", roll, pitch, yaw);
-	printf("  strategy,killNrun(%ld, %ld)\n", strategy, kill);
+    /* printf("  countParse = %d\n", countParse);
+	printf("  accr(%d, %d, %d)", accelero_x, accelero_y, accelero_z);
+	printf("  gyro(%d, %d, %d)", gyroscope_x, gyroscope_y, gyroscope_z);
+	printf("  angle(%d, %d, %d)\n", roll, pitch, yaw);
+	printf("  strategy,killNrun(%d, %d)\n", strategy, kill); */
 }
 
 int main(int argc, char **argv)
 {
     initSendDataHead();
     initSendDataMotion();
-    // runLuaProgram();
+    runLuaProgram();
     rclcpp::init(argc, argv);
     auto node = std::make_shared<motion_bridge>();
     rclcpp::spin(node);

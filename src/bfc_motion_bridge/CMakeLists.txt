@@ -17,13 +17,24 @@ find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(bfc_msgs REQUIRED)
+find_package(darknet_ros_msgs REQUIRED)
 
 add_executable(motion_bridge src/bfc_motion_bridge.cpp)
 ament_target_dependencies(motion_bridge rclcpp geometry_msgs std_msgs sensor_msgs bfc_msgs)
 
+add_executable(head_movement src/bfc_head_movement.cpp)
+ament_target_dependencies(head_movement rclcpp geometry_msgs std_msgs sensor_msgs bfc_msgs darknet_ros_msgs)
+
 install(TARGETS
   motion_bridge
+  head_movement
   DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY 
+  launch 
+  config 
+  DESTINATION share/${PROJECT_NAME}/
 )
 
 ament_package()

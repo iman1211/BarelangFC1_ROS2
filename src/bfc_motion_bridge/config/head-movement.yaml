@@ -1,0 +1,9 @@
+head_movement:
+  ros__parameters:
+    robot_number_: 1
+    frame_x_: 640
+    frame_y_: 480
+    ball_pan_kp_: 0.075
+    ball_pan_kd_: 0.0000505
+    ball_tilt_kp_: 0.05
+    ball_tilt_kd_: 0.0000755
